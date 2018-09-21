@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui">
+    
+<h:head>
+<title>Taches a effectuer</title>
+</h:head>
+<body>
+
+<h:form id="taches" style="width:350px;" >
+
+<p:growl id="growl" sticky="true" showDetail="true" life="3000" />
+
+<nobr><p:selectCheckboxMenu id="categories" value="#{iTaches.categoriesSel}" label="Categories"
+                              filter="false" style="width:64%;">
+            <f:selectItems value="#{iTaches.categories}" />
+        </p:selectCheckboxMenu>
+         <p:commandButton type="button" value="Créer" style="width:34%; padding:0.2em important!, 1em ;" onclick="PF('creationTache').show(); false;"   />
+   </nobr>
+
+ <p:dialog header="Création" id="creationTache" widgetVar="creationTache" resizable="false" width="350" style="padding:5px;">
+       
+                      
+  <p:selectOneMenu id="categorie" value="#{iTaches.categorieCreation}">
+            <f:selectItems value="#{iTaches.categories}" />
+        </p:selectOneMenu>
+        
+            
+            <p:inputText id="texte" value="#{iTaches.texteCreation}" required="true" label="Tache" />
+ 			<p:watermark for="texte" value="nouvelle Tache" id="watermarkTexte" />
+ 			
+            <f:facet name="footer">
+                <p:commandButton value="Créer" update="growl" actionListener="#{iTaches.creerTache}" />
+            </f:facet>  
+       
+    </p:dialog>
+    
+   
+   
+    
+</h:form>
+  
+        
+</body>
+</html>
