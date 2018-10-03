@@ -1,48 +1,73 @@
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:p="http://primefaces.org/ui">
-    
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
 <h:head>
-<title>Taches a effectuer</title>
+
+	<title>Taches a effectuer</title>
 </h:head>
 <body>
 
-<h:form id="taches" style="width:350px;" >
+	<h:form id="taches" style="width:350px;">
 
-<p:growl id="growl" sticky="true" showDetail="true" life="3000" />
+		<p:growl id="growl" sticky="true" showDetail="true" life="3000" />
 
-<nobr><p:selectCheckboxMenu id="categories" value="#{iTaches.categoriesSel}" label="Categories"
-                              filter="false" style="width:64%;">
-            <f:selectItems value="#{iTaches.categories}" />
-        </p:selectCheckboxMenu>
-         <p:commandButton type="button" value="Créer" style="width:34%; padding:0.2em important!, 1em ;" onclick="PF('creationTache').show(); false;"   />
-   </nobr>
+		<p:commandLink style="float:right">Evariste</p:commandLink>
 
- <p:dialog header="Création" id="creationTache" widgetVar="creationTache" resizable="false" width="350" style="padding:5px;">
-       
-                      
-  <p:selectOneMenu id="categorie" value="#{iTaches.categorieCreation}">
-            <f:selectItems value="#{iTaches.categories}" />
-        </p:selectOneMenu>
-        
-            
-            <p:inputText id="texte" value="#{iTaches.texteCreation}" required="true" label="Tache" />
- 			<p:watermark for="texte" value="nouvelle Tache" id="watermarkTexte" />
- 			
-            <f:facet name="footer">
-                <p:commandButton value="Créer" update="growl" actionListener="#{iTaches.creerTache}" />
-            </f:facet>  
-       
-    </p:dialog>
-    
-   
-   
-    
-</h:form>
-  
-        
+		<p:selectCheckboxMenu id="categories" value="#{iTaches.categoriesSel}"
+			label="Categories" filter="false" style="width:64%;">
+			<f:selectItems value="#{iTaches.categories}">
+
+			</f:selectItems>
+			<p:ajax event="toggleSelect" update="listeTaches"></p:ajax>
+			<p:ajax event="change" update="listeTaches"></p:ajax>
+		</p:selectCheckboxMenu>
+
+		<p:dataList id="listeTaches" value="#{iTaches.taches}" var="tache"
+			type="definition" style="border:0">
+			<p:button value="#{tache.titre}" style="width:100%"></p:button>
+		</p:dataList>
+
+		<p:commandButton type="button" value="Créer"
+			style="width:100%;"
+			onclick="PF('creationTache').show(); false;" />
+
+		<p:dialog header="Création" id="creationTache"
+			widgetVar="creationTache" resizable="false" width="350"
+			style="padding:5px;">
+
+			<p:selectOneMenu id="categorie" value="#{iTaches.categorieCreation}">
+				<f:selectItems value="#{iTaches.categories}" />
+			</p:selectOneMenu>
+
+
+			<p:inputText id="texte" value="#{iTaches.texteCreation}"
+				required="true" label="Tache" />
+			<p:watermark for="texte" value="nouvelle Tache" id="watermarkTexte" />
+
+			<f:facet name="footer">
+				<p:commandButton value="Créer" update="@all"
+					actionListener="#{iTaches.creerTache}" />
+			</f:facet>
+
+		</p:dialog>
+
+
+
+
+	</h:form>
+	<script>
+
+ $(document).ready(function(){$("#taches\\:categories_panel").mouseleave(function(event) {
+		var element=$("#taches\\:categories_panel");
+		element.hide();
+	 	});
+	 });
+
+</script>
+
 </body>
 </html>

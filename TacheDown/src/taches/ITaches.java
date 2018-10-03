@@ -1,5 +1,6 @@
 package taches;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,6 +61,7 @@ public class ITaches {
 		tache.setTitre(texteCreation);
 		tache.setDtCreation(new Date());
 		tache.setIndex(getMaxIndex());
+		taches.put(tache.getIndex(), tache);
 	}
 	
 	private int getMaxIndex(){
@@ -71,4 +73,12 @@ public class ITaches {
 		return index+10;
 	}
 
+	public List<ETache> getTaches(){
+		List<ETache> liste = new ArrayList<ETache>();
+		for(ETache tache : taches.values()){
+			if(categoriesSel.contains(tache.getCategorie())) liste.add(tache);
+			
+		}
+		return liste;
+	}
 }
