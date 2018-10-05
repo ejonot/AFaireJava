@@ -2,13 +2,31 @@ package taches;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
 /*Entite : Tache */
 
+@Entity(name="Tache")
 public class ETache {
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	private int index;
+	private int position;
 	private String titre;
 	private Etat etat;
+
+	@OneToOne(cascade=CascadeType.ALL,fetch = FetchType.EAGER)
+	@JoinColumn(name="categorie")
 	private Categorie categorie;
 	private Date dtCreation;
 	
@@ -18,11 +36,12 @@ public class ETache {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getIndex() {
-		return index;
+	
+	public int getPosition() {
+		return position;
 	}
-	public void setIndex(int index) {
-		this.index = index;
+	public void setPosition(int position) {
+		this.position = position;
 	}
 	public String getTitre() {
 		return titre;

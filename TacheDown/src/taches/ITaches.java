@@ -11,6 +11,8 @@ import java.util.Set;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import config.Dao;
+
 @ViewScoped
 @ManagedBean
 public class ITaches {
@@ -21,8 +23,9 @@ public class ITaches {
 	protected Categorie categorieCreation;
 	protected String texteCreation;
 	
-	protected  List<Categorie> categoriesSel=Arrays.asList(Categorie.values());
-
+	protected  List<Categorie> categoriesSel=new ArrayList<Categorie>();
+	protected List<Categorie> categories;
+	
 	public List<Categorie> getCategoriesSel() {
 		return categoriesSel;
 	}
@@ -48,11 +51,21 @@ public class ITaches {
 	}
 
 	public ITaches(){
-		
+		Categorie perso=new Categorie(0,"Perso" , "#FFDEAD");
+		Categorie jardin=new Categorie(0,"Jardinage" , "#2E8B57");
+		Categorie bricolage=new Categorie(0,"Vricolage" , "#A0522D");
+		categories=new ArrayList<Categorie>();
+		categories.add(perso);
+		Dao.addCategorie(perso);
+		categories.add(jardin);
+		Dao.addCategorie(jardin);
+		categories.add(bricolage);
+		Dao.addCategorie(bricolage);
+		categoriesSel=new ArrayList<>(categories);
 	}
 	
-	public Categorie[] getCategories(){
-		return Categorie.values();
+	public List<Categorie> getCategories(){
+		return categories;
 	}
 	
 	public void creerTache(){
@@ -60,8 +73,9 @@ public class ITaches {
 		tache.setCategorie(categorieCreation);
 		tache.setTitre(texteCreation);
 		tache.setDtCreation(new Date());
-		tache.setIndex(getMaxIndex());
-		taches.put(tache.getIndex(), tache);
+		tache.setPosition(getMaxIndex());
+		Dao.insertTache(tache);
+		taches.put(tache.getPosition(), tache);
 	}
 	
 	private int getMaxIndex(){
@@ -74,11 +88,12 @@ public class ITaches {
 	}
 
 	public List<ETache> getTaches(){
-		List<ETache> liste = new ArrayList<ETache>();
+		return Dao.findTaches(getCategoriesSel());
+		/*List<ETache> liste = new ArrayList<ETache>();
 		for(ETache tache : taches.values()){
 			if(categoriesSel.contains(tache.getCategorie())) liste.add(tache);
 			
 		}
-		return liste;
+		return liste;*/
 	}
 }

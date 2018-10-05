@@ -19,7 +19,7 @@
 
 		<p:selectCheckboxMenu id="categories" value="#{iTaches.categoriesSel}"
 			label="Categories" filter="false" style="width:64%;">
-			<f:selectItems value="#{iTaches.categories}">
+			<f:selectItems value="#{iTaches.categories}" var="cat" itemLabel="#{cat.texte}">
 
 			</f:selectItems>
 			<p:ajax event="toggleSelect" update="listeTaches"></p:ajax>
@@ -40,7 +40,7 @@
 			style="padding:5px;">
 
 			<p:selectOneMenu id="categorie" value="#{iTaches.categorieCreation}">
-				<f:selectItems value="#{iTaches.categories}" />
+				<f:selectItems value="#{iTaches.categories}" var="cat" itemLabel="#{cat.texte}"/>
 			</p:selectOneMenu>
 
 
@@ -54,9 +54,6 @@
 			</f:facet>
 
 		</p:dialog>
-
-
-
 
 	</h:form>
 	<script>
