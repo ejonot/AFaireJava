@@ -5,66 +5,159 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:p="http://primefaces.org/ui">
 
-<h:head>
 
+
+<h:head>
+<link href="style/Style.css" rel="stylesheet" media="all"
+	type="text/css" />
+	
+	
+ 
 	<title>Taches a effectuer</title>
 </h:head>
 <body>
+	<div class="container" style="width: 350px;">
+		<h:form id="taches">
 
-	<h:form id="taches" style="width:350px;">
+			<p:growl id="growl" sticky="true" showDetail="true" life="3000" />
+			<h:messages></h:messages>
+			<p:commandLink style="float:right">Evariste</p:commandLink>
 
-		<p:growl id="growl" sticky="true" showDetail="true" life="3000" />
+			<p:selectCheckboxMenu id="categories"
+				value="#{iTaches.categoriesSel}" label="Categories" filter="false"
+				style="width:64%;" converter="#{categorieConverter}">
+				<f:selectItems value="#{tachesDAO.categories}" var="cat"
+					itemLabel="#{cat.texte}" itemValue="#{cat}">
 
-		<p:commandLink style="float:right">Evariste</p:commandLink>
+				</f:selectItems>
+				<p:ajax event="toggleSelect" update="taches:listeTaches"></p:ajax>
+				<p:ajax event="change" update="taches:listeTaches"></p:ajax>
+			</p:selectCheckboxMenu>
 
-		<p:selectCheckboxMenu id="categories" value="#{iTaches.categoriesSel}"
-			label="Categories" filter="false" style="width:64%;">
-			<f:selectItems value="#{iTaches.categories}" var="cat" itemLabel="#{cat.texte}">
+			<p:dataList id="listeTaches" value="#{iTaches.taches}" var="tache"
+				type="definition" style="border:0 !important"
+				emptyMessage="Aucune tâche en attente pour les categories choisies"
+				onLoad="">
 
-			</f:selectItems>
-			<p:ajax event="toggleSelect" update="listeTaches"></p:ajax>
-			<p:ajax event="change" update="listeTaches"></p:ajax>
-		</p:selectCheckboxMenu>
+				<p:commandButton value="#{tache.titre}"
+					style=" width:100%; Background-color:#{tache.categorie.couleur};"
+					class="#{(iTaches.isTacheActive(tache))? 'cache' : ''}"
+					converter="#{tacheConverter}"
+					actionListener="#{iTaches.setTacheActive(tache.id)}"
+					update="taches" oncomplete="moveEditionTache();">
 
-		<p:dataList id="listeTaches" value="#{iTaches.taches}" var="tache"
-			type="definition" style="border:0">
-			<p:button value="#{tache.titre}" style="width:100%"></p:button>
-		</p:dataList>
+				</p:commandButton>
 
-		<p:commandButton type="button" value="Créer"
-			style="width:100%;"
-			onclick="PF('creationTache').show(); false;" />
+				<!-- rendered="#{not iTaches.isTacheActive(tache)}" -->
 
-		<p:dialog header="Création" id="creationTache"
-			widgetVar="creationTache" resizable="false" width="350"
-			style="padding:5px;">
+			</p:dataList>
 
-			<p:selectOneMenu id="categorie" value="#{iTaches.categorieCreation}">
-				<f:selectItems value="#{iTaches.categories}" var="cat" itemLabel="#{cat.texte}"/>
-			</p:selectOneMenu>
+			<p:outputPanel id="editionTache"
+				rendered="#{iTaches.tacheActive ne null}"
+				style="padding:20px; #c4c4c4 -moz-linear-gradient(top, rgba(255,255,255,0.8), rgba(255,255,255,0)); position:relative; text-align:center; Background-color:#{iTache.categorie.couleur};
+				">
+
+				<p:button id="move"
+					style="position:absolute; left:0px; top:0px;width:16px; height:16px;"
+					styleClass="ui-state-default ui-corner-all"
+					icon="ui-icon-arrow-4-diag"
+					onclick="activerDragDrop(this);"
+					>
+				</p:button>
 
 
-			<p:inputText id="texte" value="#{iTaches.texteCreation}"
-				required="true" label="Tache" />
-			<p:watermark for="texte" value="nouvelle Tache" id="watermarkTexte" />
+				<p:commandButton id="close"
+					style="position:absolute; right:0px; top:0px;width:16px; height:16px;"
+					styleClass="ui-state-default ui-corner-all"
+					icon="ui-icon-closethick"
+					actionListener="#{iTaches.desactiverTache()}" update="taches">
+				</p:commandButton>
 
-			<f:facet name="footer">
-				<p:commandButton value="Créer" update="@all"
-					actionListener="#{iTaches.creerTache}" />
-			</f:facet>
+				<p:selectOneMenu id="categorie" value="#{iTache.categorie}"
+					converter="#{categorieConverter}">
+					<p:ajax event="change"
+						listener="#{iTache.updateTache(iTaches.tacheActive)}"
+						update="editionTache">
+					</p:ajax>
+					<f:selectItems value="#{tachesDAO.categories}" var="cat"
+						itemLabel="#{cat.texte}" itemValue="#{cat}" />
+				</p:selectOneMenu>
 
-		</p:dialog>
 
-	</h:form>
-	<script>
+				<p:inputText id="texte" value="#{iTache.texte}" required="true"
+					label="Tache">
+					<p:ajax event="keyup"
+						listener="#{iTache.updateTache(iTaches.tacheActive)}"
+						update="editionTache">
+					</p:ajax>
+				</p:inputText>
+			
 
- $(document).ready(function(){$("#taches\\:categories_panel").mouseleave(function(event) {
-		var element=$("#taches\\:categories_panel");
-		element.hide();
-	 	});
-	 });
+				<p:commandButton id="link"
+					style="position:absolute; left:0px; bottom:0px;width:16px; height:16px;"
+					styleClass="ui-state-default ui-corner-all" icon="ui-icon-link">
+				</p:commandButton>
 
-</script>
+				<p:commandButton id="validate"
+					style="position:absolute; right:0px; bottom:0px; width:16px; height:16px;"
+					styleClass="ui-state-default ui-corner-all" icon="ui-icon-check"
+					actionListener="#{iTaches.cloreTache(iTache.id)}"
+					update="taches">
+					<p:confirm header="Confirmation" message="Clore la tache?"
+						icon="ui-icon-alert" />
+				</p:commandButton>
+			</p:outputPanel>
+
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+				<p:commandButton value="Oui" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="Non" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+
+			<p:commandButton value="Créer" style="width:100%;"
+				actionListener="#{iTaches.desactiverTache()}"
+				onclick="PF('creationTache').show(); false;" update="taches" />
+
+		</h:form>
+
+		<h:form id="newTache">
+			<p:dialog header="Création" id="creationTache"
+				widgetVar="creationTache" resizable="false" width="350"
+				style="padding:5px;">
+
+				<p:selectOneMenu id="categorie" value="#{iTache.categorie}"
+					converter="#{categorieConverter}">
+					<f:selectItems value="#{tachesDAO.categories}" var="cat"
+						itemLabel="#{cat.texte}" itemValue="#{cat}" />
+				</p:selectOneMenu>
+
+
+				<p:inputText id="texte" value="#{iTache.texte}" required="true"
+					label="Tache" />
+				<p:watermark for="texte" value="nouvelle Tache" id="watermarkTexte" />
+
+				<f:facet name="footer">
+					<p:commandButton value="Créer" update="newTache, taches"
+						actionListener="#{iTache.creerTache}" />
+				</f:facet>
+
+			</p:dialog>
+
+		</h:form>
+
+	</div>
+	<script src="script/script.js">
+		
+	</script>
+<script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+  crossorigin="anonymous"></script>
+<script
+  src="https://code.jquery.com/jquery-1.12.4.js"
+  integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+  crossorigin="anonymous"></script>
 
 </body>
 </html>

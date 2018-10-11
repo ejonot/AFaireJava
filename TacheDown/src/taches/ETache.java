@@ -24,7 +24,14 @@ public class ETache {
 	private int position;
 	private String titre;
 	private Etat etat;
-
+	private boolean ouvert=true;
+	
+	public boolean isOuvert() {
+		return ouvert;
+	}
+	public void setOuvert(boolean ouvert) {
+		this.ouvert = ouvert;
+	}
 	@OneToOne(cascade=CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="categorie")
 	private Categorie categorie;
