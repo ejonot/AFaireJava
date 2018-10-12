@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -17,10 +19,11 @@ import org.apache.openjpa.lib.util.OrderedMap;
 public class TachesDAO {
 
 	//LIste de taches, a modifier pour persistance
-	private  Map<Integer, ETache> tachesParPosition=new OrderedMap<Integer, ETache>();
-	private  Map<Integer, ETache> tachesParId=new OrderedMap<Integer, ETache>();
-	private  Map<Integer,Categorie> categories=new OrderedMap<Integer,Categorie>();
+	private  SortedMap<Integer, ETache> tachesParPosition=new TreeMap<Integer, ETache>();
+	private  SortedMap<Integer, ETache> tachesParId=new TreeMap<Integer, ETache>();
+	private  SortedMap<Integer,Categorie> categories=new TreeMap<Integer,Categorie>();
 
+	private Map<Integer, List<Integer>> dependancesTaches=new HashMap<Integer, List<Integer>>();
 	
 	public TachesDAO() {
 		Categorie perso=new Categorie(0,"Perso" , "#FFDEAD");
@@ -30,6 +33,14 @@ public class TachesDAO {
 		addCategorie(perso);
 		addCategorie(jardin);	
 		addCategorie(bricolage);
+		
+		ETache tache1=new ETache("Suspendre etagère chambre", bricolage);
+		ETache tache2=new ETache("Tailler la haie", jardin);
+		ETache tache3=new ETache("Réinstaller PC", perso);
+		
+		creerTache(tache1);
+		creerTache(tache2);
+		creerTache(tache3);
 	}
 
 	private  int getMaxPositionTache(){
@@ -103,7 +114,36 @@ public class TachesDAO {
  }
  
  public  ETache getTache(Integer id) {
-	 if(tachesParId.containsKey(id)) return tachesParId.get(id);
+	 if(id!=null && tachesParId.containsKey(id)) return tachesParId.get(id);
 	 return null;
+ }
+ 
+ public boolean deplacerTacheAvant(ETache aDeplacer, ETache tacheAfter) {
+	 Integer positionAprès=tacheAfter.getPosition();
+	Integer positionAvant=0;
+	for(Integer i : tachesParPosition.keySet()) {
+		if(i<positionAprès) positionAvant=i;
+		else break;
+	}
+	if(positionAprès==positionAvant) {System.out.println("erreur pas de position dispo pour le déplacement");
+	return false;}
+	Integer newPosition=Math.round((positionAprès+positionAvant)/2);
+	Integer oldPosition=aDeplacer.getPosition();
+	aDeplacer.setPosition(newPosition);
+	tachesParPosition.remove(oldPosition);
+	tachesParPosition.put(newPosition, aDeplacer);
+	tachesParId.put(aDeplacer.getId(), aDeplacer);
+	return true;
+ }
+ 
+ public boolean dependre(ETache estDependante, ETache depentDe) {
+	 if(estDependante==null || depentDe==null) return false;
+	 List<Integer> liste=null;
+	 if(dependancesTaches.containsKey(estDependante.getId())) liste=dependancesTaches.get(estDependante.getId());
+	 if(liste==null) liste=new ArrayList<Integer>();
+	 liste.add(depentDe.getId());
+	 dependancesTaches.put(estDependante.getId(), liste);
+	 
+	 return true;
  }
 }

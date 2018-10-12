@@ -3,16 +3,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:p="http://primefaces.org/ui">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jstl/core">
 
 
 
 <h:head>
-<link href="style/Style.css" rel="stylesheet" media="all"
-	type="text/css" />
-	
-	
- 
+	<link href="style/Style.css" rel="stylesheet" media="all"
+		type="text/css" />
+
+<script>
+var idTaches=new Array();
+</script>
+
 	<title>Taches a effectuer</title>
 </h:head>
 <body>
@@ -34,36 +37,47 @@
 				<p:ajax event="change" update="taches:listeTaches"></p:ajax>
 			</p:selectCheckboxMenu>
 
+			<p:remoteCommand name="deplacementTache"
+				actionListener="#{iTaches.deplacerTache}" update="taches" />
+
+<p:remoteCommand name="dependanceTache"
+				actionListener="#{iTaches.dependre}" update="taches" />
+				
 			<p:dataList id="listeTaches" value="#{iTaches.taches}" var="tache"
 				type="definition" style="border:0 !important"
 				emptyMessage="Aucune tâche en attente pour les categories choisies"
 				onLoad="">
 
 				<p:commandButton value="#{tache.titre}"
-					style=" width:100%; Background-color:#{tache.categorie.couleur};"
+					style=" width:100%; background-color:#{tache.categorie.couleur};"
 					class="#{(iTaches.isTacheActive(tache))? 'cache' : ''}"
 					converter="#{tacheConverter}"
 					actionListener="#{iTaches.setTacheActive(tache.id)}"
-					update="taches" oncomplete="moveEditionTache();">
-
+					update="taches" 
+					oncomplete="moveEditionTache();PF('creationTache').hide();"
+					id="tache"
+					>
 				</p:commandButton>
 
-				<!-- rendered="#{not iTaches.isTacheActive(tache)}" -->
 
 			</p:dataList>
-
+	<script >
+	idTaches=new Array();
+		<c:forEach var="tache" items="#{iTaches.taches}">
+	   	 idTaches.push(#{tache.id});
+	 	 </c:forEach>
+	</script>
+	
 			<p:outputPanel id="editionTache"
 				rendered="#{iTaches.tacheActive ne null}"
 				style="padding:20px; #c4c4c4 -moz-linear-gradient(top, rgba(255,255,255,0.8), rgba(255,255,255,0)); position:relative; text-align:center; Background-color:#{iTache.categorie.couleur};
 				">
 
-				<p:button id="move"
+				<p:commandButton id="move"
 					style="position:absolute; left:0px; top:0px;width:16px; height:16px;"
 					styleClass="ui-state-default ui-corner-all"
-					icon="ui-icon-arrow-4-diag"
-					onclick="activerDragDrop(this);"
-					>
-				</p:button>
+					icon="ui-icon-arrow-4-diag" onclick="activerDeplacement();">
+				</p:commandButton>
 
 
 				<p:commandButton id="close"
@@ -91,18 +105,18 @@
 						update="editionTache">
 					</p:ajax>
 				</p:inputText>
-			
+
 
 				<p:commandButton id="link"
 					style="position:absolute; left:0px; bottom:0px;width:16px; height:16px;"
-					styleClass="ui-state-default ui-corner-all" icon="ui-icon-link">
+					styleClass="ui-state-default ui-corner-all" icon="ui-icon-link"
+					 onclick="activerLiaison();">
 				</p:commandButton>
 
 				<p:commandButton id="validate"
 					style="position:absolute; right:0px; bottom:0px; width:16px; height:16px;"
 					styleClass="ui-state-default ui-corner-all" icon="ui-icon-check"
-					actionListener="#{iTaches.cloreTache(iTache.id)}"
-					update="taches">
+					actionListener="#{iTaches.cloreTache(iTache.id)}" update="taches">
 					<p:confirm header="Confirmation" message="Clore la tache?"
 						icon="ui-icon-alert" />
 				</p:commandButton>
@@ -147,17 +161,7 @@
 		</h:form>
 
 	</div>
-	<script src="script/script.js">
-		
-	</script>
-<script
-  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
-  crossorigin="anonymous"></script>
-<script
-  src="https://code.jquery.com/jquery-1.12.4.js"
-  integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
-  crossorigin="anonymous"></script>
+<script src="script/script.js" />
 
 </body>
 </html>

@@ -75,6 +75,13 @@ public class ETache {
 		this.dtCreation = dtCreation;
 	}
 	
+	public ETache() {
+		
+	}
 	
+	public ETache(String Titre, Categorie cat) {
+		setTitre(Titre);
+		setCategorie(cat);
+	}
 
 }

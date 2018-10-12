@@ -2,15 +2,13 @@ package taches;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.event.ActionEvent;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.event.ValueChangeEvent;
+
+import javax.faces.context.FacesContext;
+
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -69,7 +67,7 @@ public class ITaches implements Serializable{
 	}
 	@PostConstruct
 	public void init() {
-		System.out.println("new iTache");
+		//System.out.println("new iTache");
 		tacheActive=null;
 		categoriesSel=new ArrayList<>(tachesDAO.getCategories());
 		
@@ -80,5 +78,36 @@ public class ITaches implements Serializable{
 		tache.setOuvert(false);
 		tachesDAO.updateTache(tache);
 		desactiverTache();
+	}
+	
+	public void deplacerTache() {
+		
+		Map<String,String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+		String idTacheAfter = params.get("idTache");
+	
+		try {
+			Integer idTA=Integer.parseInt(idTacheAfter);
+			ETache tacheAfter=tachesDAO.getTache(idTA);
+			ETache aDeplacer=tachesDAO.getTache(tacheActive);
+			tachesDAO.deplacerTacheAvant(aDeplacer, tacheAfter);
+			desactiverTache();
+		}catch(NumberFormatException e) {
+			
+		}	
+	}
+	
+	public void dependre() {
+		Map<String,String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+				String dependantDe = params.get("dependantDe");
+		try {
+			Integer idDependantDe=Integer.parseInt(dependantDe);
+			ETache tacheDependante=tachesDAO.getTache(tacheActive);
+			ETache tacheDepentDe=tachesDAO.getTache(idDependantDe);
+			tachesDAO.dependre(tacheDependante, tacheDepentDe);
+			desactiverTache();
+			
+		}catch(NumberFormatException e) {
+			
+		}	
 	}
 }

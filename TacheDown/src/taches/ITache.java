@@ -85,10 +85,6 @@ public class ITache implements Serializable{
 		return tachesDAO.getCategories();
 	}
 	
-	@PostConstruct
-	protected void init() {
-		System.out.println("new ITache");
-	}
 	
 
 }
